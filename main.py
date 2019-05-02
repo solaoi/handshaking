@@ -37,8 +37,10 @@ def is_chattering(gpio):
         return False
 
     now = time.time()
+    chattering_time = now - latest_touched_time
+    print(chattering_time)
 
-    if now - latest_touched_time < ACCEPT_CHATTERING_TIME:
+    if chattering_time < ACCEPT_CHATTERING_TIME:
         latest_touched_time = now
 
         return True
