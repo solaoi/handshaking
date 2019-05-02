@@ -24,30 +24,6 @@ pi = None
 socketServer = None
 last_used_pin = 0
 is_motor_moved = False
-latest_touched_time = 0
-
-
-def is_chattering(gpio):
-    global latest_touched_time
-
-    if gpio is not last_used_pin:
-        return False
-
-    if latest_touched_time is 0:
-        return False
-
-    now = time.time()
-    chattering_time = now - latest_touched_time
-    print(chattering_time)
-
-    if chattering_time < ACCEPT_CHATTERING_TIME:
-        latest_touched_time = now
-
-        return True
-
-    latest_touched_time = now
-
-    return False
 
 
 def set_motor_position(position):
@@ -112,12 +88,8 @@ def sensor_touched(gpio, level, tick):
     global pi
     global last_used_pin
     global is_motor_moved
-    global latest_touched_time
 
     print(gpio, level, tick)
-
-    if is_chattering(gpio):
-        return True
 
     if is_correct_action(gpio):
         socketServer.send_message_to_all("good")
@@ -135,7 +107,6 @@ def sensor_touched(gpio, level, tick):
         socketServer.send_message_to_all("excellent")
         play_sound_with('end-game')
         last_used_pin = 0
-        latest_touched_time = 0
         set_motor_position(MOTOR_DEFAULT_POSITION)
         is_motor_moved = False
 
@@ -147,7 +118,6 @@ def sensor_touched(gpio, level, tick):
     socketServer.send_message_to_all("bad")
     play_sound_with('fault')
     last_used_pin = 0
-    latest_touched_time = 0
 
     if is_motor_moved:
         set_motor_position(MOTOR_DEFAULT_POSITION)
