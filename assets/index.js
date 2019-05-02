@@ -17,17 +17,17 @@
         console.log(evt.data);
 
         if (evt.data === 'good') {
-            document.getElementById("wait").style.display = "none";
+            document.getElementById("default").style.display = "none";
             document.getElementById("good").style.display = "block";
             document.getElementById("bad").style.display = "none";
             document.getElementById("excellent").style.display = "none";
         } else if (evt.data === 'bad') {
-            document.getElementById("wait").style.display = "none";
+            document.getElementById("default").style.display = "none";
             document.getElementById("good").style.display = "none";
             document.getElementById("bad").style.display = "block";
             document.getElementById("excellent").style.display = "none";
         } else if (evt.data === 'excellent') {
-            document.getElementById("wait").style.display = "none";
+            document.getElementById("default").style.display = "none";
             document.getElementById("good").style.display = "none";
             document.getElementById("bad").style.display = "none";
             document.getElementById("excellent").style.display = "block";
