@@ -36,15 +36,15 @@ def play_sound_with(action):
     アクションに応じて音を再生する
     """
     if action == 'correct':
-        subprocess.run(['mpg321', 'assets/button_true.mp3'], check=True, stdout=subprocess.DEVNULL,
+        subprocess.run(['mpg321', 'assets/sound/button_true.mp3'], check=True, stdout=subprocess.DEVNULL,
                        stderr=subprocess.DEVNULL)
         return True
     if action == 'fault':
-        subprocess.run(['mpg321', 'assets/button_false.mp3'], check=True, stdout=subprocess.DEVNULL,
+        subprocess.run(['mpg321', 'assets/sound/button_false.mp3'], check=True, stdout=subprocess.DEVNULL,
                        stderr=subprocess.DEVNULL)
         return True
     if action == 'end-game':
-        subprocess.run(['mpg321', 'assets/end_game.mp3'], check=True, stdout=subprocess.DEVNULL,
+        subprocess.run(['mpg321', 'assets/sound/end_game.mp3'], check=True, stdout=subprocess.DEVNULL,
                        stderr=subprocess.DEVNULL)
         return True
 
@@ -108,7 +108,8 @@ def sensor_touched(gpio, level, tick):
         set_motor_position(MOTOR_DEFAULT_POSITION)
         is_motor_moved = False
 
-        sleep(3)
+        sleep(5)
+        socketServer.send_message_to_all("reset")
 
         return True
 
@@ -119,6 +120,9 @@ def sensor_touched(gpio, level, tick):
     if is_motor_moved:
         set_motor_position(MOTOR_DEFAULT_POSITION)
         is_motor_moved = False
+
+    sleep(2)
+    socketServer.send_message_to_all("reset")
 
     return True
 
@@ -156,6 +160,10 @@ def main():
 
     websocket_server = Websocket(55555, '127.0.0.1', servers=[])
     websocket_server.start()
+
+    # WebSocketサーバーが起動するまでwait
+    while not websocket_server.servers:
+        sleep(1)
 
     socketServer = websocket_server.servers[0]
 
