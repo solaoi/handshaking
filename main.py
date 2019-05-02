@@ -5,7 +5,7 @@ coding: utf-8
 import subprocess
 import sys
 import threading
-from time import sleep
+import time
 
 import pigpio
 from websocket_server import WebsocketServer
@@ -18,10 +18,34 @@ INITIAL_PIN = 14
 SECOND_PIN = 15
 LAST_PIN = 17
 
+ACCEPT_CHATTERING_TIME = 0.5
+
 pi = None
 socketServer = None
 last_used_pin = 0
 is_motor_moved = False
+latest_touched_time = 0
+
+
+def is_chattering(gpio):
+    global latest_touched_time
+
+    if gpio is not last_used_pin:
+        return False
+
+    if latest_touched_time is 0:
+        return False
+
+    now = time.time()
+
+    if now - latest_touched_time < ACCEPT_CHATTERING_TIME:
+        latest_touched_time = now
+
+        return True
+
+    latest_touched_time = now
+
+    return False
 
 
 def set_motor_position(position):
@@ -86,8 +110,12 @@ def sensor_touched(gpio, level, tick):
     global pi
     global last_used_pin
     global is_motor_moved
+    global latest_touched_time
 
     print(gpio, level, tick)
+
+    if is_chattering(gpio):
+        return True
 
     if is_correct_action(gpio):
         socketServer.send_message_to_all("good")
@@ -105,10 +133,11 @@ def sensor_touched(gpio, level, tick):
         socketServer.send_message_to_all("excellent")
         play_sound_with('end-game')
         last_used_pin = 0
+        latest_touched_time = 0
         set_motor_position(MOTOR_DEFAULT_POSITION)
         is_motor_moved = False
 
-        sleep(5)
+        time.sleep(4)
         socketServer.send_message_to_all("reset")
 
         return True
@@ -116,12 +145,13 @@ def sensor_touched(gpio, level, tick):
     socketServer.send_message_to_all("bad")
     play_sound_with('fault')
     last_used_pin = 0
+    latest_touched_time = 0
 
     if is_motor_moved:
         set_motor_position(MOTOR_DEFAULT_POSITION)
         is_motor_moved = False
 
-    sleep(2)
+    time.sleep(2)
     socketServer.send_message_to_all("reset")
 
     return True
@@ -163,13 +193,13 @@ def main():
 
     # WebSocketサーバーが起動するまでwait
     while not websocket_server.servers:
-        sleep(1)
+        time.sleep(1)
 
     socketServer = websocket_server.servers[0]
 
     while True:
         try:
-            sleep(1)
+            time.sleep(1)
         except KeyboardInterrupt:
             sys.exit(0)
 

@@ -5,17 +5,19 @@ html {
 body {
     background-color: black;
     height: 100%;
+    margin: 0;
 }
 
 img {
-    width: 100%;
-    height: auto;
+    width: auto;
+    height: 100%;
+    margin: auto;
     display: none;
 }
 
 p {
     color: white;
-    font-size: xx-large;
+    font-size: 5em;
     font-weight: bold;
     position: absolute;
     top: 50%;
