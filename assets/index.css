@@ -30,3 +30,7 @@ p {
     position: relative;
     height: 100%;
 }
+
+.default {
+    display: none;
+}

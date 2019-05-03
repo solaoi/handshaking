@@ -4,11 +4,15 @@
     // 接続時のイベント
     socket.onopen = function (evt) {
         console.log("socket open");
+        document.getElementById("no-connect").style.display = "none";
+        document.getElementById("default").style.display = "block";
     };
 
     // 切断時のイベント
     socket.onclose = function (evt) {
         console.log('Disconnected');
+        document.getElementById("default").style.display = "none";
+        document.getElementById("no-connect").style.display = "block";
     };
 
     // メッセージ受信時のイベント
